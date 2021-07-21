@@ -21,6 +21,7 @@ setup(
         "zigpy",
         "click",
         "coloredlogs",
+        "scapy",
     ],
     extras_require={
         # [all] pulls in all radio libraries
