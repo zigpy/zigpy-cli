@@ -48,7 +48,6 @@ async def radio(ctx, radio, port):
         }
     )
     app = app_cls(config)
-    await app.startup(auto_form=False)
 
     ctx.obj = app
     ctx.call_on_close(radio_cleanup)
@@ -84,7 +83,9 @@ def dump_app_info(app):
 
 @radio.command()
 @click.pass_obj
-def info(app):
+@click_coroutine
+async def info(app):
+    await app.startup(auto_form=False)
     dump_app_info(app)
 
 
@@ -92,5 +93,6 @@ def info(app):
 @click.pass_obj
 @click_coroutine
 async def form(app):
+    await app.startup(auto_form=True)
     await app.form_network()
     dump_app_info(app)
