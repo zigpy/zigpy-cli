@@ -85,3 +85,13 @@ $ zigpy ota dump-firmware 10047227-1.2-TRADFRI-cv-cct-unified-2.3.050.ota.ota.si
       | grep 'Ember Version'
 Ember Version:    6.3.1.1
 ```
+
+
+# PCAP
+Re-calculate the FCS on a packet capture due to a bug in current EmberZNet SDK releases:
+```console
+$ # Fix an existing capture
+$ zigpy pcap fix-fcs input.pcap fixed.pcap
+$ # Fix a capture from stdin and send it to stdout
+$ bellows -d /dev/cu.GoControl_zigbee dump -w /dev/stdout | zigpy pcap fix-fcs - - | wireshark -k -S -i -
+```
