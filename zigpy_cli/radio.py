@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import pickle
 import logging
 import importlib
 
@@ -7,7 +8,6 @@ import click
 import zigpy.config as conf
 
 from zigpy_cli.cli import cli, click_coroutine
-from zigpy_cli.utils import format_bytes
 from zigpy_cli.common import RADIO_TO_PYPI, RADIO_TO_PACKAGE, RADIO_LOGGING_CONFIGS
 
 LOGGER = logging.getLogger(__name__)
@@ -49,6 +49,8 @@ async def radio(ctx, radio, port):
     )
     app = app_cls(config)
 
+    await app.connect()
+
     ctx.obj = app
     ctx.call_on_close(radio_cleanup)
 
@@ -57,36 +59,49 @@ async def radio(ctx, radio, port):
 @click_coroutine
 async def radio_cleanup(app):
     try:
-        await app.pre_shutdown()
+        await app.shutdown()
     except RuntimeError:
         LOGGER.warning("Caught an exception when shutting down app", exc_info=True)
-
-
-def dump_app_info(app):
-    if app.pan_id is not None:
-        print(f"PAN ID:                0x{app.pan_id:04X}")
-
-    print(f"Extended PAN ID:       {app.extended_pan_id}")
-    print(f"Channel:               {app.channel}")
-
-    if app.channels is not None:
-        print(f"Channel mask:          {list(app.channels)}")
-
-    print(f"NWK update ID:         {app.nwk_update_id}")
-    print(f"Device IEEE:           {app.ieee}")
-    print(f"Device NWK:            0x{app.nwk:04X}")
-
-    if getattr(app, "network_key", None) is not None:
-        print(f"Network key:           {format_bytes(app.network_key)}")
-        print(f"Network key sequence:  {app.network_key_seq}")
 
 
 @radio.command()
 @click.pass_obj
 @click_coroutine
 async def info(app):
-    await app.startup(auto_form=False)
-    dump_app_info(app)
+    await app.load_network_info(load_devices=False)
+
+    print(f"PAN ID:                0x{app.state.network_info.pan_id:04X}")
+    print(f"Extended PAN ID:       {app.state.network_info.extended_pan_id}")
+    print(f"Channel:               {app.state.network_info.channel}")
+    print(f"Channel mask:          {list(app.state.network_info.channel_mask)}")
+    print(f"NWK update ID:         {app.state.network_info.nwk_update_id}")
+    print(f"Device IEEE:           {app.state.node_info.ieee}")
+    print(f"Device NWK:            0x{app.state.node_info.nwk:04X}")
+    print(f"Network key:           {app.state.network_info.network_key.key}")
+    print(f"Network key sequence:  {app.state.network_info.network_key.seq}")
+    print(f"Network key counter:   {app.state.network_info.network_key.tx_counter}")
+
+
+@radio.command()
+@click.argument("output", type=click.File("wb"))
+@click.pass_obj
+@click_coroutine
+async def backup(app, output):
+    await app.load_network_info(load_devices=True)
+
+    # TODO: switch to JSON serialization for security
+    pickle.dump((app.state.network_info, app.state.node_info), output)
+
+
+@radio.command()
+@click.argument("input", type=click.File("rb"))
+@click.pass_obj
+@click_coroutine
+async def restore(app, input):
+    network_info, node_info = pickle.load(input)
+
+    # TODO: switch to JSON serialization for security
+    await app.write_network_info(network_info=network_info, node_info=node_info)
 
 
 @radio.command()
@@ -95,4 +110,3 @@ async def info(app):
 async def form(app):
     await app.startup(auto_form=True)
     await app.form_network()
-    dump_app_info(app)
