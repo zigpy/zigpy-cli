@@ -105,7 +105,9 @@ async def backup(app, output):
 @click_coroutine
 async def restore(app, input):
     obj = json.load(input)
+
     network_info, node_info = zigpy.state.json_to_network_state(obj)
+    network_info.network_key_counter += 5000
 
     await app.connect()
     await app.write_network_info(network_info=network_info, node_info=node_info)
