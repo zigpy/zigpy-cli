@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-import pickle
+import json
 import logging
 import importlib
 
 import click
+import zigpy.state
 import zigpy.config as conf
 
 from zigpy_cli.cli import cli, click_coroutine
@@ -49,8 +50,6 @@ async def radio(ctx, radio, port):
     )
     app = app_cls(config)
 
-    await app.connect()
-
     ctx.obj = app
     ctx.call_on_close(radio_cleanup)
 
@@ -68,6 +67,7 @@ async def radio_cleanup(app):
 @click.pass_obj
 @click_coroutine
 async def info(app):
+    await app.connect()
     await app.load_network_info(load_devices=False)
 
     print(f"PAN ID:                0x{app.state.network_info.pan_id:04X}")
@@ -83,24 +83,31 @@ async def info(app):
 
 
 @radio.command()
-@click.argument("output", type=click.File("wb"))
+@click.argument("output", type=click.File("w"))
 @click.pass_obj
 @click_coroutine
 async def backup(app, output):
+    await app.connect()
     await app.load_network_info(load_devices=True)
 
-    # TODO: switch to JSON serialization for security
-    pickle.dump((app.state.network_info, app.state.node_info), output)
+    obj = zigpy.state.network_state_to_json(
+        network_info=app.state.network_info,
+        node_info=app.state.node_info,
+        source="zigpy-cli@0.0.1",
+    )
+
+    output.write(json.dumps(obj, indent=4))
 
 
 @radio.command()
-@click.argument("input", type=click.File("rb"))
+@click.argument("input", type=click.File("r"))
 @click.pass_obj
 @click_coroutine
 async def restore(app, input):
-    network_info, node_info = pickle.load(input)
+    obj = json.load(input)
+    network_info, node_info = zigpy.state.json_to_network_state(obj)
 
-    # TODO: switch to JSON serialization for security
+    await app.connect()
     await app.write_network_info(network_info=network_info, node_info=node_info)
 
 
@@ -108,5 +115,6 @@ async def restore(app, input):
 @click.pass_obj
 @click_coroutine
 async def form(app):
+    await app.connect()
     await app.startup(auto_form=True)
     await app.form_network()
