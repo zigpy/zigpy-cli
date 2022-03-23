@@ -6,7 +6,6 @@ import importlib
 
 import click
 import zigpy.state
-import zigpy.config as conf
 
 from zigpy_cli.cli import cli, click_coroutine
 from zigpy_cli.common import RADIO_TO_PYPI, RADIO_TO_PACKAGE, RADIO_LOGGING_CONFIGS
@@ -18,8 +17,9 @@ LOGGER = logging.getLogger(__name__)
 @click.pass_context
 @click.argument("radio", type=click.Choice(list(RADIO_TO_PACKAGE.keys())))
 @click.argument("port", type=str)
+@click.option("--baudrate", type=int, default=None)
 @click_coroutine
-async def radio(ctx, radio, port):
+async def radio(ctx, radio, port, baudrate=None):
     # Setup logging for the radio
     verbose = ctx.parent.params["verbose"]
     logging_configs = RADIO_LOGGING_CONFIGS[radio]
@@ -41,13 +41,11 @@ async def radio(ctx, radio, port):
 
     # Start the radio
     app_cls = radio_module.ControllerApplication
-    config = app_cls.SCHEMA(
-        {
-            conf.CONF_DEVICE: {
-                conf.CONF_DEVICE_PATH: port,
-            },
-        }
-    )
+    config = app_cls.SCHEMA({"device": {"path": port}})
+
+    if baudrate is not None:
+        config["device"]["baudrate"] = baudrate
+
     app = app_cls(config)
 
     ctx.obj = app
