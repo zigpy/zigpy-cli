@@ -2,9 +2,13 @@ from __future__ import annotations
 
 import logging
 import importlib
+import collections
 
 import click
+import zigpy.state
+import zigpy.types
 import zigpy.config as conf
+import zigpy.zdo.types
 
 from zigpy_cli.cli import cli, click_coroutine
 from zigpy_cli.utils import format_bytes
@@ -96,3 +100,51 @@ async def form(app):
     await app.startup(auto_form=True)
     await app.form_network()
     dump_app_info(app)
+
+
+@radio.command()
+@click.pass_obj
+@click_coroutine
+async def energy_scan(app):
+    await app.startup()
+    LOGGER.info("Running scan...")
+
+    # We compute an average over the last 5 scans
+    channel_energies = collections.defaultdict(lambda: collections.deque([], maxlen=5))
+
+    while True:
+        rsp = await app.get_device(nwk=0x0000).zdo.Mgmt_NWK_Update_req(
+            zigpy.zdo.types.NwkUpdate(
+                ScanChannels=zigpy.types.Channels.ALL_CHANNELS,
+                ScanDuration=0x02,
+                ScanCount=1,
+            )
+        )
+
+        _, scanned_channels, _, _, energy_values = rsp
+
+        for channel, energy in zip(scanned_channels, energy_values):
+            energies = channel_energies[channel]
+            energies.append(energy)
+
+        total = 0xFF * len(energies)
+
+        print(f"Channel energy (mean of {len(energies)} / {energies.maxlen}):")
+        print("------------------------------------------------")
+        print(" + Lower energy is better")
+        print(" + Active Zigbee networks on a channel may still cause congestion")
+        print(" + TX on 26 in North America may be with lower power due to regulations")
+        print(" + Zigbee channels 15, 20, 25 fall between WiFi channels 1, 6, 11")
+        print(" + Some Zigbee devices only join networks on channels 15, 20, and 25")
+        print("------------------------------------------------")
+
+        for channel, energies in channel_energies.items():
+            count = sum(energies)
+            asterisk = "*" if channel == 26 else " "
+
+            print(
+                f" - {channel:>02}{asterisk}  {count / total:>7.2%}  "
+                + "#" * int(100 * count / total)
+            )
+
+        print()
