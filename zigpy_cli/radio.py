@@ -12,7 +12,12 @@ import zigpy.zdo.types
 
 from zigpy_cli.cli import cli, click_coroutine
 from zigpy_cli.utils import format_bytes
-from zigpy_cli.common import RADIO_TO_PYPI, RADIO_TO_PACKAGE, RADIO_LOGGING_CONFIGS
+from zigpy_cli.common import (
+    RADIO_TO_PYPI,
+    HEX_OR_DEC_INT,
+    RADIO_TO_PACKAGE,
+    RADIO_LOGGING_CONFIGS,
+)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -104,16 +109,24 @@ async def form(app):
 
 @radio.command()
 @click.pass_obj
+@click.option("--nwk", type=HEX_OR_DEC_INT, default=0x0000)
 @click_coroutine
-async def energy_scan(app):
+async def energy_scan(app, nwk):
     await app.startup()
     LOGGER.info("Running scan...")
+
+    # Temporarily create a zigpy device for scans not using the coordinator itself
+    if nwk != 0x0000:
+        app.add_device(
+            nwk=nwk,
+            ieee=zigpy.types.EUI64.convert("AA:AA:AA:AA:AA:AA:AA:AA"),
+        )
 
     # We compute an average over the last 5 scans
     channel_energies = collections.defaultdict(lambda: collections.deque([], maxlen=5))
 
     while True:
-        rsp = await app.get_device(nwk=0x0000).zdo.Mgmt_NWK_Update_req(
+        rsp = await app.get_device(nwk=nwk).zdo.Mgmt_NWK_Update_req(
             zigpy.zdo.types.NwkUpdate(
                 ScanChannels=zigpy.types.Channels.ALL_CHANNELS,
                 ScanDuration=0x02,
