@@ -124,9 +124,7 @@ async def restore(app, input):
 @click.pass_obj
 @click_coroutine
 async def form(app):
-    await app.connect()
     await app.startup(auto_form=True)
-    await app.form_network()
 
 
 @radio.command()
