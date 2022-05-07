@@ -36,16 +36,17 @@ async def radio(ctx, radio, port, baudrate=None):
     for logger, level in logging_config.items():
         logging.getLogger(logger).setLevel(level)
 
-    # Import the radio library
     module = RADIO_TO_PACKAGE[radio] + ".zigbee.application"
 
-    try:
-        radio_module = importlib.import_module(module)
-    except ImportError:
+    # Catching just `ImportError` masks dependency errors and is annoying
+    if importlib.util.find_spec(module) is None:
         raise click.ClickException(
             f"Radio module for {radio!r} is not installed."
             f" Install it with `pip install {RADIO_TO_PYPI[radio]}`."
         )
+
+    # Import the radio library
+    radio_module = importlib.import_module(module)
 
     # Start the radio
     app_cls = radio_module.ControllerApplication
