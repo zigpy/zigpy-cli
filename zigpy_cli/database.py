@@ -25,11 +25,11 @@ def sqlite3_split_statements(sql: str) -> list[str]:
     statements = []
     statement = ""
 
-    for chunk in sql.strip().split(";"):
-        if not chunk:
-            continue
+    chunks = sql.strip().split(";")
+    chunks_with_delimiter = [s + ";" for s in chunks[:-1]] + [chunks[-1]]
 
-        statement += chunk + ";"
+    for chunk in chunks_with_delimiter:
+        statement += chunk
 
         if sqlite3.complete_statement(statement):
             statements.append(statement.strip())
