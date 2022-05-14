@@ -100,7 +100,6 @@ async def backup(app, output):
     obj = zigpy.state.network_state_to_json(
         network_info=app.state.network_info,
         node_info=app.state.node_info,
-        source="zigpy-cli@0.0.1",
     )
 
     output.write(json.dumps(obj, indent=4))
