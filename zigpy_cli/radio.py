@@ -11,13 +11,9 @@ import zigpy.config as conf
 import zigpy.zdo.types
 
 from zigpy_cli.cli import cli, click_coroutine
+from zigpy_cli.const import RADIO_TO_PYPI, RADIO_TO_PACKAGE, RADIO_LOGGING_CONFIGS
 from zigpy_cli.utils import format_bytes
-from zigpy_cli.common import (
-    RADIO_TO_PYPI,
-    HEX_OR_DEC_INT,
-    RADIO_TO_PACKAGE,
-    RADIO_LOGGING_CONFIGS,
-)
+from zigpy_cli.common import HEX_OR_DEC_INT
 
 LOGGER = logging.getLogger(__name__)
 
