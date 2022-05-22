@@ -4,6 +4,7 @@ import json
 import logging
 import importlib
 import collections
+import importlib.util
 
 import click
 import zigpy.state
