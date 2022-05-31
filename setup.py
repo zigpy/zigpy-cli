@@ -3,7 +3,7 @@ import pathlib
 from setuptools import setup, find_packages
 
 import zigpy_cli
-import zigpy_cli.common
+import zigpy_cli.const
 
 setup(
     name="zigpy-cli",
@@ -25,7 +25,7 @@ setup(
     ],
     extras_require={
         # [all] pulls in all radio libraries
-        "all": zigpy_cli.common.RADIO_TO_PYPI.values(),
+        "all": zigpy_cli.const.RADIO_TO_PYPI.values(),
         "testing": [
             "pytest>=5.4.5",
             "pytest-asyncio>=0.12.0",
