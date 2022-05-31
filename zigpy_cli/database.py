@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import logging
 import pathlib
 import sqlite3
@@ -10,6 +11,7 @@ import click
 from zigpy_cli.cli import cli
 
 LOGGER = logging.getLogger(__name__)
+DB_V_REGEX = re.compile(r"(?:_v\d+)?$")
 
 
 @cli.group()
@@ -49,6 +51,20 @@ def sqlite3_recover(path: pathlib.Path) -> str:
     return subprocess.check_output(["sqlite3", str(path), ".recover"]).decode("utf-8")
 
 
+def get_table_versions(cursor) -> dict[str, str]:
+    tables = {}
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+
+    for (name,) in cursor:
+        # The regex will always return a match
+        match = DB_V_REGEX.search(name)
+        assert match is not None
+
+        tables[name] = match.group(0)
+
+    return tables
+
+
 @db.command()
 @click.argument("input_path", type=click.Path(exists=True))
 @click.argument("output_path", type=click.Path())
@@ -61,14 +77,31 @@ def recover(input_path, output_path):
     with sqlite3.connect(input_path) as conn:
         cur = conn.cursor()
         cur.execute("PRAGMA user_version")
-        (user_version,) = cur.fetchone()
+        (pragma_user_version,) = cur.fetchone()
+
+        # Get the table suffix versions as well
+        table_versions = get_table_versions(cur)
+
+    LOGGER.info("Pragma user version is %d", pragma_user_version)
+
+    max_table_version = max(
+        int(v[2:], 10) for v in table_versions.values() if v.startswith("_v")
+    )
+    LOGGER.info("Maximum table version is %d", max_table_version)
+
+    if max_table_version != pragma_user_version:
+        LOGGER.warning(
+            "Maximum table version is %d but the user_version is %d!",
+            max_table_version,
+            pragma_user_version,
+        )
 
     sql = sqlite3_recover(input_path)
     statements = sqlite3_split_statements(sql)
 
     # Perform the `INSERT` statements separately
     data_sql = []
-    schema_sql = [f"PRAGMA user_version={user_version};"]
+    schema_sql = [f"PRAGMA user_version={max_table_version};"]
 
     for statement in statements:
         if statement.startswith("INSERT"):
