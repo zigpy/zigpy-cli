@@ -167,14 +167,23 @@ async def energy_scan(app, nwk):
         print(" + TX on 26 in North America may be with lower power due to regulations")
         print(" + Zigbee channels 15, 20, 25 fall between WiFi channels 1, 6, 11")
         print(" + Some Zigbee devices only join networks on channels 15, 20, and 25")
+        print(" + Current channel is enclosed in [square brackets]")
         print("------------------------------------------------")
 
         for channel, energies in channel_energies.items():
             count = sum(energies)
             asterisk = "*" if channel == 26 else " "
 
+            if channel == app.state.network_info.channel:
+                bracket_open = "["
+                bracket_close = "]"
+            else:
+                bracket_open = " "
+                bracket_close = " "
+
             print(
-                f" - {channel:>02}{asterisk}  {count / total:>7.2%}  "
+                f" - {bracket_open}{channel:>02}{asterisk}{bracket_close}"
+                + f"   {count / total:>7.2%}  "
                 + "#" * int(100 * count / total)
             )
 
