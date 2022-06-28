@@ -104,13 +104,14 @@ async def backup(app, output):
 
 @radio.command()
 @click.argument("input", type=click.File("r"))
+@click.option("-c", "--frame-counter-increment", type=int, default=5000)
 @click.pass_obj
 @click_coroutine
-async def restore(app, input):
+async def restore(app, frame_counter_increment, input):
     obj = json.load(input)
 
     network_info, node_info = zigpy.state.json_to_network_state(obj)
-    network_info.network_key.tx_counter += 5000
+    network_info.network_key.tx_counter += frame_counter_increment
 
     await app.connect()
     await app.write_network_info(network_info=network_info, node_info=node_info)
