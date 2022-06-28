@@ -3,7 +3,6 @@ import pathlib
 from setuptools import setup, find_packages
 
 import zigpy_cli
-import zigpy_cli.common
 
 setup(
     name="zigpy-cli",
@@ -18,14 +17,16 @@ setup(
     entry_points={"console_scripts": ["zigpy=zigpy_cli.__main__:cli"]},
     packages=find_packages(exclude=["tests", "tests.*"]),
     install_requires=[
-        "zigpy",
         "click",
         "coloredlogs",
         "scapy",
+        "zigpy>=0.47.1",
+        "bellows>=0.31.0",
+        "zigpy-deconz>=0.18.0",
+        "zigpy-znp>=0.8.0",
     ],
     extras_require={
         # [all] pulls in all radio libraries
-        "all": zigpy_cli.common.RADIO_TO_PYPI.values(),
         "testing": [
             "pytest>=5.4.5",
             "pytest-asyncio>=0.12.0",

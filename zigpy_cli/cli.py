@@ -7,7 +7,7 @@ import functools
 import click
 import coloredlogs
 
-from zigpy_cli.common import LOG_LEVELS
+from zigpy_cli.const import LOG_LEVELS
 
 LOGGER = logging.getLogger(__name__)
 
