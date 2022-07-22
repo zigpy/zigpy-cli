@@ -87,17 +87,19 @@ async def info(app):
 
 
 @radio.command()
+@click.option("-z", "--zigpy-format", is_flag=True, type=bool, default=False)
 @click.argument("output", type=click.File("w"))
 @click.pass_obj
 @click_coroutine
-async def backup(app, output):
+async def backup(app, zigpy_format, output):
     await app.connect()
-    await app.load_network_info(load_devices=True)
 
-    obj = zigpy.state.network_state_to_json(
-        network_info=app.state.network_info,
-        node_info=app.state.node_info,
-    )
+    backup = await app.backups.create_backup(load_devices=True)
+
+    if zigpy_format:
+        obj = backup.as_dict()
+    else:
+        obj = backup.as_open_coordinator_json()
 
     output.write(json.dumps(obj, indent=4))
 
@@ -109,12 +111,10 @@ async def backup(app, output):
 @click_coroutine
 async def restore(app, frame_counter_increment, input):
     obj = json.load(input)
-
-    network_info, node_info = zigpy.state.json_to_network_state(obj)
-    network_info.network_key.tx_counter += frame_counter_increment
+    backup = zigpy.backups.NetworkBackup.from_dict(obj)
 
     await app.connect()
-    await app.write_network_info(network_info=network_info, node_info=node_info)
+    await app.backups.restore_backup(backup, counter_increment=frame_counter_increment)
 
 
 @radio.command()
