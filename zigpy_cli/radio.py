@@ -88,7 +88,7 @@ async def info(app):
 
 @radio.command()
 @click.option("-z", "--zigpy-format", is_flag=True, type=bool, default=False)
-@click.argument("output", type=click.File("w"))
+@click.argument("output", type=click.File("w"), default="-")
 @click.pass_obj
 @click_coroutine
 async def backup(app, zigpy_format, output):
@@ -101,7 +101,7 @@ async def backup(app, zigpy_format, output):
     else:
         obj = backup.as_open_coordinator_json()
 
-    output.write(json.dumps(obj, indent=4))
+    output.write(json.dumps(obj, indent=4) + "\n")
 
 
 @radio.command()
