@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import logging
 import importlib
+import itertools
 import collections
 import importlib.util
 
@@ -121,15 +122,16 @@ async def restore(app, frame_counter_increment, input):
 @click.pass_obj
 @click_coroutine
 async def form(app):
-    await app.startup(auto_form=True)
+    await app.connect()
     await app.form_network()
 
 
 @radio.command()
 @click.pass_obj
 @click.option("--nwk", type=HEX_OR_DEC_INT, default=0x0000)
+@click.option("-n", "--num-scans", type=int, default=-1)
 @click_coroutine
-async def energy_scan(app, nwk):
+async def energy_scan(app, nwk, num_scans):
     await app.startup()
     LOGGER.info("Running scan...")
 
@@ -143,7 +145,10 @@ async def energy_scan(app, nwk):
     # We compute an average over the last 5 scans
     channel_energies = collections.defaultdict(lambda: collections.deque([], maxlen=5))
 
-    while True:
+    for scan in itertools.count():
+        if num_scans != -1 and scan > num_scans:
+            break
+
         rsp = await app.get_device(nwk=nwk).zdo.Mgmt_NWK_Update_req(
             zigpy.zdo.types.NwkUpdate(
                 ScanChannels=zigpy.types.Channels.ALL_CHANNELS,
