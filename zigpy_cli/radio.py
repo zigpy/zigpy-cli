@@ -48,7 +48,7 @@ async def radio(ctx, radio, port, baudrate=None):
 
     # Start the radio
     app_cls = radio_module.ControllerApplication
-    config = app_cls.SCHEMA({"device": {"path": port}})
+    config = app_cls.SCHEMA({"device": {"path": port}, "backup_enabled": False})
 
     if baudrate is not None:
         config["device"]["baudrate"] = baudrate
