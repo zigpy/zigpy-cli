@@ -136,7 +136,7 @@ def recover(input_path, output_path):
             try:
                 cur.execute(statement)
             except sqlite3.IntegrityError as e:
-                LOGGER.error("Failed to insert %s: %r", statement, e)
+                LOGGER.warning("Skipping %s: %r", statement, e)
 
         # And finally commit
         for statement in ["PRAGMA writable_schema = off;", "COMMIT;"]:
