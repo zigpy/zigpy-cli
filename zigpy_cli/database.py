@@ -1,12 +1,16 @@
 from __future__ import annotations
 
 import re
+import asyncio
 import logging
 import pathlib
 import sqlite3
+import tempfile
 import subprocess
 
 import click
+import zigpy.appdb
+from zigpy_znp.zigbee.application import ControllerApplication
 
 from zigpy_cli.cli import cli
 
@@ -65,6 +69,27 @@ def get_table_versions(cursor) -> dict[str, str]:
     return tables
 
 
+async def test_database(path: pathlib.Path):
+    """
+    Opens the zigpy database with zigpy and attempts to load its contents.
+    """
+
+    with tempfile.TemporaryDirectory() as dir_name:
+        dir_path = pathlib.Path(dir_name)
+        db_file = dir_path / "zigbee.db"
+        db_file.write_bytes(path.read_bytes())
+
+        app = await ControllerApplication.new(
+            {"database_path": str(db_file), "device": {"path": "/dev/null"}},
+            auto_form=False,
+            start_radio=False,
+        )
+
+        await app.shutdown()
+
+    return app
+
+
 @db.command()
 @click.argument("input_path", type=click.Path(exists=True))
 @click.argument("output_path", type=click.Path())
@@ -94,6 +119,13 @@ def recover(input_path, output_path):
             "Maximum table version is %d but the user_version is %d!",
             max_table_version,
             pragma_user_version,
+        )
+
+    if zigpy.appdb.DB_VERSION != max_table_version:
+        LOGGER.warning(
+            "Zigpy's current DB version is %s but the maximum table version is %s!",
+            zigpy.appdb.DB_VERSION,
+            max_table_version,
         )
 
     sql = sqlite3_recover(input_path)
@@ -143,4 +175,17 @@ def recover(input_path, output_path):
             LOGGER.debug("Postamble: %s", statement)
             cur.execute(statement)
 
-    LOGGER.info("Done")
+    LOGGER.info("Finished writing database")
+
+    # Load the database with zigpy and test it
+    app = asyncio.run(test_database(pathlib.Path(output_path)))
+    uninitialized_devices = [d for d in app.devices.values() if not d.is_initialized]
+
+    LOGGER.info(
+        "Recovered %d devices (%d uninitialized)",
+        len(app.devices),
+        len(uninitialized_devices),
+    )
+
+    for device in app.devices.values():
+        LOGGER.info("%s", device)
