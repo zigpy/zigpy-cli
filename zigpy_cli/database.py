@@ -124,6 +124,15 @@ def recover(input_path, output_path):
         for statement in data_sql:
             LOGGER.debug("Data: %s", statement)
 
+            # Ignore internal tables
+            if statement.startswith(
+                (
+                    'INSERT INTO "sqlite_sequence"(',
+                    "CREATE TABLE IF NOT EXISTS  sqlite_sequence(",
+                )
+            ):
+                continue
+
             try:
                 cur.execute(statement)
             except sqlite3.IntegrityError as e:
