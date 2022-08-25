@@ -89,13 +89,29 @@ async def info(app):
 
 @radio.command()
 @click.option("-z", "--zigpy-format", is_flag=True, type=bool, default=False)
+@click.option(
+    "--i-understand-i-can-update-eui64-only-once-and-i-still-want-to-do-it",
+    is_flag=True,
+    type=bool,
+    default=False,
+)
 @click.argument("output", type=click.File("w"), default="-")
 @click.pass_obj
 @click_coroutine
-async def backup(app, zigpy_format, output):
+async def backup(
+    app,
+    zigpy_format,
+    i_understand_i_can_update_eui64_only_once_and_i_still_want_to_do_it,
+    output,
+):
     await app.connect()
 
     backup = await app.backups.create_backup(load_devices=True)
+
+    if i_understand_i_can_update_eui64_only_once_and_i_still_want_to_do_it:
+        backup.network_info.stack_specific.setdefault("ezsp", {})[
+            "i_understand_i_can_update_eui64_only_once_and_i_still_want_to_do_it"
+        ] = True
 
     if zigpy_format:
         obj = backup.as_dict()
