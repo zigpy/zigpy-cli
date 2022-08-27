@@ -28,6 +28,7 @@ Commands:
 
 # Network commands
 Network commands require the radio type to be specified. See `zigpy radio --help` for the list of supported types.
+If your radio requires a different baudrate than the radio library default (mainly EZSP), you must specify it as a command line option. For example, `zigpy radio --baudrate 115200 ezsp backup -`.
 
 ## Network backup
 
