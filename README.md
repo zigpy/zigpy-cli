@@ -26,6 +26,9 @@ Commands:
   pcap
 ```
 
+**Make sure ZHA, Zigbee2MQTT, deCONZ, etc. are disabled.** Any software controlling your
+radio requires exclusive access to the hardware: if both are running at once, neither will work.
+
 # Network commands
 Network commands require the radio type to be specified. See `zigpy radio --help` for the list of supported types.
 If your radio requires a different baudrate than the radio library default (mainly EZSP), you must specify it as a command line option. For example, `zigpy radio --baudrate 115200 ezsp backup -`.
