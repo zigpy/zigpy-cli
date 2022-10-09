@@ -145,6 +145,12 @@ async def form(app):
 
 @radio.command()
 @click.pass_obj
+@click_coroutine
+async def reset(app):
+    await app.connect()
+    await app.reset_network_info()
+
+
 @click.option("--nwk", type=HEX_OR_DEC_INT, default=0x0000)
 @click.option("-n", "--num-scans", type=int, default=-1)
 @click_coroutine
