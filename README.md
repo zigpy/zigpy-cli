@@ -115,6 +115,29 @@ Channel energy (mean of 1 / 5):
  - 26*   81.96%  #################################################################################
 ```
 
+## Reset a radio
+
+```console
+$ zigpy radio --baudrate 115200 ezsp /dev/serial/by-id/some-radio reset
+```
+
+## Permit joins
+
+Mainly useful for testing requests.
+
+```console
+$ zigpy radio deconz /dev/ttyUSB0 permit -t 60
+```
+
+## Changing the network channel
+
+Note that not all devices will migrate. This is currently only supported on deCONZ and ZNP coordinators.
+Other radios will successfully broadcast the change to other devices but you will need to perform a network backup, change the channel, and then restore the backup.
+
+```console
+$ zigpy radio znp /dev/ttyUSB0 change-channel --channel 25
+```
+
 # OTA
 ## Display basic information about OTA files
 ```console
