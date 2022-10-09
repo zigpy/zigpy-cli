@@ -8,6 +8,7 @@ import collections
 import importlib.util
 
 import click
+import zigpy.zdo
 import zigpy.state
 import zigpy.types
 import zigpy.zdo.types
@@ -209,3 +210,37 @@ async def energy_scan(app, nwk, num_scans):
             )
 
         print()
+
+
+@radio.command()
+@click.pass_obj
+@click.option("-c", "--channel", type=int)
+@click_coroutine
+async def change_channel(app, channel):
+    await app.startup()
+
+    for i in range(10):
+        LOGGER.info("Sending channel change broadcast %d / %d", i + 1, 10)
+
+        await zigpy.zdo.broadcast(
+            app=app,
+            command=zigpy.zdo.types.ZDOCmd.Mgmt_NWK_Update_req,
+            grpid=None,
+            radius=0,
+            broadcast_address=zigpy.types.BroadcastAddress.ALL_DEVICES,
+            NwkUpdate=zigpy.zdo.types.NwkUpdate(
+                ScanChannels=zigpy.types.Channels.from_channel_list([channel]),
+                ScanDuration=zigpy.zdo.types.NwkUpdate.CHANNEL_CHANGE_REQ,
+                nwkUpdateId=app.state.network_info.nwk_update_id + 1,
+            ),
+        )
+
+    LOGGER.info("Changing coordinator channel")
+
+    await app.get_device(nwk=0x0000).zdo.Mgmt_NWK_Update_req(
+        zigpy.zdo.types.NwkUpdate(
+            ScanChannels=zigpy.types.Channels.from_channel_list([channel]),
+            ScanDuration=zigpy.zdo.types.NwkUpdate.CHANNEL_CHANGE_REQ,
+            nwkUpdateId=app.state.network_info.nwk_update_id + 1,
+        ),
+    )
