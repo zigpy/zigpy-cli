@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import asyncio
 import logging
 import importlib
 import itertools
@@ -151,6 +152,18 @@ async def reset(app):
     await app.reset_network_info()
 
 
+@radio.command()
+@click.pass_obj
+@click.option("-t", "--join-time", type=int, default=250)
+@click_coroutine
+async def permit(app, join_time):
+    await app.startup(auto_form=True)
+    await app.permit(join_time)
+    await asyncio.sleep(join_time)
+
+
+@radio.command()
+@click.pass_obj
 @click.option("--nwk", type=HEX_OR_DEC_INT, default=0x0000)
 @click.option("-n", "--num-scans", type=int, default=-1)
 @click_coroutine
