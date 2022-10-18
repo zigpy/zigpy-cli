@@ -36,19 +36,19 @@ If your radio requires a different baudrate than the radio library default (main
 ## Network backup
 
 ```console
-$ zigpy radio deconz /dev/ttyUSB0 network backup deconz-backup.json
+$ zigpy radio deconz /dev/ttyUSB0 backup deconz-backup.json
 ```
 
 ## Network restore
 
 ```console
-$ zigpy radio znp /dev/ttyUSB1 network restore deconz-backup.json
+$ zigpy radio znp /dev/ttyUSB1 restore deconz-backup.json
 ```
 
 ## Reading network information
 
 ```console
-$ zigpy radio znp /dev/ttyUSB0 network info
+$ zigpy radio znp /dev/ttyUSB0 info
 PAN ID:                0x718B
 Extended PAN ID:       33:29:33:5e:30:42:64:48
 Channel:               15
