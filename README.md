@@ -131,8 +131,7 @@ $ zigpy radio deconz /dev/ttyUSB0 permit -t 60
 
 ## Changing the network channel
 
-Note that not all devices will migrate. This is currently only supported on deCONZ and ZNP coordinators.
-Other radios will successfully broadcast the change to other devices but you will need to perform a network backup, change the channel, and then restore the backup.
+Some devices (like older Aqara sensors) may not migrate.
 
 ```console
 $ zigpy radio znp /dev/ttyUSB0 change-channel --channel 25
