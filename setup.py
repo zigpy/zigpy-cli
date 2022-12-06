@@ -21,7 +21,7 @@ setup(
         "coloredlogs",
         "scapy",
         "zigpy>=0.48.1",
-        "bellows>=0.31.0",
+        "bellows>=0.34.3",
         "zigpy-deconz>=0.18.0",
         "zigpy-znp>=0.8.0",
     ],

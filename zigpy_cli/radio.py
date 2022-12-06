@@ -26,8 +26,9 @@ LOGGER = logging.getLogger(__name__)
 @click.argument("radio", type=click.Choice(list(RADIO_TO_PACKAGE.keys())))
 @click.argument("port", type=str)
 @click.option("--baudrate", type=int, default=None)
+@click.option("--database", type=str, default=None)
 @click_coroutine
-async def radio(ctx, radio, port, baudrate=None):
+async def radio(ctx, radio, port, baudrate=None, database=None):
     # Setup logging for the radio
     verbose = ctx.parent.params["verbose"]
     logging_configs = RADIO_LOGGING_CONFIGS[radio]
@@ -50,7 +51,28 @@ async def radio(ctx, radio, port, baudrate=None):
 
     # Start the radio
     app_cls = radio_module.ControllerApplication
-    config = app_cls.SCHEMA({"device": {"path": port}, "backup_enabled": False})
+    config = app_cls.SCHEMA(
+        {
+            "device": {"path": port},
+            "backup_enabled": False,
+            "database_path": database,
+            "ezsp_config": {
+                "CONFIG_SOURCE_ROUTE_TABLE_SIZE": None,
+                "CONFIG_END_DEVICE_POLL_TIMEOUT": None,
+                "CONFIG_SECURITY_LEVEL": None,
+                "CONFIG_APPLICATION_ZDO_FLAGS": None,
+                "CONFIG_MULTICAST_TABLE_SIZE": None,
+                "CONFIG_ADDRESS_TABLE_SIZE": None,
+                "CONFIG_TC_REJOINS_USING_WELL_KNOWN_KEY_TIMEOUT_S": None,
+                "CONFIG_SUPPORTED_NETWORKS": None,
+                "CONFIG_TRUST_CENTER_ADDRESS_CACHE_SIZE": None,
+                "CONFIG_INDIRECT_TRANSMISSION_TIMEOUT": None,
+                # "CONFIG_STACK_PROFILE": None,
+                "CONFIG_PAN_ID_CONFLICT_REPORT_THRESHOLD": None,
+                "CONFIG_PACKET_BUFFER_COUNT": None,
+            },
+        }
+    )
 
     if baudrate is not None:
         config["device"]["baudrate"] = baudrate
