@@ -166,3 +166,14 @@ $ zigpy pcap fix-fcs input.pcap fixed.pcap
 $ # Fix a capture from stdin and send it to stdout
 $ bellows -d /dev/cu.GoControl_zigbee dump -w /dev/stdout | zigpy pcap fix-fcs - - | wireshark -k -S -i -
 ```
+
+# Database
+Attempt to recover a corrupted `zigbee.db` database:
+
+```console
+$ zigpy -v db recover broken.db fixed.db
+2022-05-07 13:01:22.907 host zigpy_cli.database ERROR Failed to insert INSERT INTO "attributes_cache_v7"("_rowid_", "ieee", "endpoint_id", "cluster", "attrid", "value") VALUES( 14507477, '00:15:8d:00:02:5e:f9:ff', 1, 1027, 0, 1001.78 );: IntegrityError('UNIQUE constraint failed: attributes_cache_v7.ieee, attributes_cache_v7.endpoint_id, attributes_cache_v7.cluster, attributes_cache_v7.attrid')
+2022-05-07 13:01:22.916 host zigpy_cli.database INFO Done
+```
+
+The final database will have no invalid constraints but data will likely be lost.
