@@ -12,11 +12,13 @@ authors = [
 license = {text = "GPL-3.0"}
 requires-python = ">=3.8"
 dependencies = [
-    "zigpy>=0.52.0",
-    "async_timeout",
-    "voluptuous",
+    "click",
     "coloredlogs",
-    "jsonschema",
+    "scapy",
+    "zigpy>=0.48.1",
+    "bellows>=0.34.3",
+    "zigpy-deconz>=0.18.0",
+    "zigpy-znp>=0.8.0",
 ]
 dynamic = ["version", "readme"]
 
