@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-import re
 import asyncio
 import logging
 import pathlib
+import re
 import sqlite3
-import tempfile
 import subprocess
+import tempfile
 
 import click
 import zigpy.appdb

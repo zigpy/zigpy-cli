@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=61.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "zigpy-cli"
+description = "Unified command line interface for zigpy radios"
+urls = {repository = "https://github.com/zigpy/zigpy-cli"}
+authors = [
+    {name = "puddly", email = "puddly3@gmail.com"}
+]
+license = {text = "GPL-3.0"}
+requires-python = ">=3.8"
+dependencies = [
+    "zigpy>=0.52.0",
+    "async_timeout",
+    "voluptuous",
+    "coloredlogs",
+    "jsonschema",
+]
+dynamic = ["version", "readme"]
+
+[tool.setuptools.dynamic]
+version = {attr = "zigpy_cli.__version__"}
+readme = {file = "README.md"}
+
+[tool.setuptools.packages.find]
+exclude = ["tests", "tests.*"]
+
+[project.optional-dependencies]
+testing = [
+    "pytest>=7.1.2",
+    "pytest-asyncio>=0.19.0",
+    "pytest-timeout>=2.1.0",
+    "pytest-mock>=3.8.2",
+    "pytest-cov>=3.0.0",
+]
+
+[project.scripts]
+zigpy = "zigpy_cli.__main__:cli"
+
+
+[tool.ruff]
+select = [
+    # Pyflakes
+    "F",
+    # Pycodestyle
+    "E",
+    "W",
+    # isort
+    "I001"
+]
+src = ["zigpy_cli", "tests"]
+
+[tool.ruff.isort]
+known-first-party = ["zigpy_cli", "tests"]

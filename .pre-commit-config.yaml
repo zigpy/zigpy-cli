@@ -1,16 +1,11 @@
 repos:
   - repo: https://github.com/psf/black
-    rev: 22.3.0
+    rev: 23.1.0
     hooks:
       - id: black
-        args:
-          - --safe
-          - --quiet
-  - repo: https://gitlab.com/pycqa/flake8
-    rev: 4.0.1
+        args: ["--safe", "--quiet"]
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: 'v0.0.244'
     hooks:
-      - id: flake8
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.10.1
-    hooks:
-      - id: isort
+      - id: ruff
+        args: ["--fix"]
