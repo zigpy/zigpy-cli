@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import asyncio
-import logging
 import functools
+import logging
 
 import click
 import coloredlogs

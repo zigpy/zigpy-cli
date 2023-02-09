@@ -3,9 +3,9 @@ from __future__ import annotations
 import logging
 
 import click
-from scapy.utils import PcapReader, PcapWriter
 from scapy.config import conf as scapy_conf
 from scapy.layers.dot15d4 import Dot15d4  # NOQA: F401
+from scapy.utils import PcapReader, PcapWriter
 
 from zigpy_cli.cli import cli
 
