@@ -10,6 +10,7 @@ urls = {repository = "https://github.com/zigpy/zigpy-cli"}
 authors = [
     {name = "puddly", email = "puddly3@gmail.com"}
 ]
+readme = "README.md"
 license = {text = "GPL-3.0"}
 requires-python = ">=3.8"
 dependencies = [
@@ -21,11 +22,6 @@ dependencies = [
     "zigpy-deconz>=0.18.0",
     "zigpy-znp>=0.8.0",
 ]
-dynamic = ["readme"]
-
-[tool.setuptools.dynamic]
-version = {attr = "zigpy_cli.__version__"}
-readme = {file = "README.md"}
 
 [tool.setuptools.packages.find]
 exclude = ["tests", "tests.*"]

@@ -19,7 +19,7 @@ jobs:
         version="${{ github.event.release.tag_name }}"
         version="${version,,}"  # lowercase it
         version="${version#v}"  # remove `v`
-        sed -i "s/version = \"0.0.0\"/version = \"${version}\"/" pyproject.toml
+        sed -i "s/version = \"0\.0\.0\"/version = \"${version}\"/" pyproject.toml
     - name: Install wheel
       run: >-
         pip install wheel build
@@ -27,6 +27,6 @@ jobs:
       run: >-
         python3 -m build
     - name: Publish distribution to PyPI
-      uses: pypa/gh-action-pypi-publish@master
+      uses: pypa/gh-action-pypi-publish@release/v1
       with:
         password: ${{ secrets.PYPI_TOKEN }}
