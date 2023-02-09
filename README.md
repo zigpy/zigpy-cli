@@ -7,7 +7,7 @@ Zigbee tools into a single binary.
 ## Installation
 
 ```console
-$ pip install git+https://github.com/zigpy/zigpy-cli.git
+$ pip install zigpy-cli
 ```
 
 ## Usage
