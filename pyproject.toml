@@ -4,6 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "zigpy-cli"
+version = "0.0.0"
 description = "Unified command line interface for zigpy radios"
 urls = {repository = "https://github.com/zigpy/zigpy-cli"}
 authors = [
@@ -20,7 +21,7 @@ dependencies = [
     "zigpy-deconz>=0.18.0",
     "zigpy-znp>=0.8.0",
 ]
-dynamic = ["version", "readme"]
+dynamic = ["readme"]
 
 [tool.setuptools.dynamic]
 version = {attr = "zigpy_cli.__version__"}
