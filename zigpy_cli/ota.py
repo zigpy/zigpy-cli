@@ -4,7 +4,7 @@ import logging
 import pathlib
 
 import click
-from zigpy.ota.image import ElementTagId, parse_ota_image
+from zigpy.ota.image import ElementTagId, HueSBLOTAImage, parse_ota_image
 from zigpy.ota.validators import validate_ota_image
 
 from zigpy_cli.cli import cli
@@ -33,8 +33,12 @@ def info(files):
         if rest:
             LOGGER.warning("Image has trailing data %s: %r", f, rest)
 
+        print(f)
+        print(f"Type: {type(image)}")
         print(f"Header: {image.header}")
-        print(f"Number of subelements: {len(image.subelements)}")
+
+        if hasattr(image, "subelements"):
+            print(f"Number of subelements: {len(image.subelements)}")
 
         try:
             result = validate_ota_image(image)
@@ -52,9 +56,12 @@ def info(files):
 def dump_firmware(input, output):
     image, _ = parse_ota_image(input.read())
 
-    for subelement in image.subelements:
-        if subelement.tag_id == ElementTagId.UPGRADE_IMAGE:
-            output.write(subelement.data)
-            break
+    if isinstance(image, HueSBLOTAImage):
+        output.write(image.data)
     else:
-        LOGGER.warning("Image has no UPGRADE_IMAGE subelements")
+        for subelement in image.subelements:
+            if subelement.tag_id == ElementTagId.UPGRADE_IMAGE:
+                output.write(subelement.data)
+                break
+        else:
+            LOGGER.warning("Image has no UPGRADE_IMAGE subelements")
