@@ -177,3 +177,26 @@ $ zigpy -v db recover broken.db fixed.db
 ```
 
 The final database will have no invalid constraints but data will likely be lost.
+
+# Compatible zigpy radio libraries (hardware/firmware)
+
+Radio libraries for [zigpy](https://github.com/zigpy/zigpy) are separate projects with their own repositories. They include:
+
+- [zigpy-znp](https://github.com/zha-ng/zigpy-znp) (radio type: znp) Texas Instruments Z-Stack ZNP based Zigbee radios with all compatible Z-Stack ZNP firmware.
+- [bellows](https://github.com/zigpy/bellows) (radio type: ezsp) Silicon Labs EmberZNet based Zigbee radios using SiLabs EZSP protocol.
+- [zigpy-deconz](https://github.com/zigpy/zigpy-deconz) (radio type: deconz) dresden elektronik deCONZ based Zigbee radios (such as ConBee II and RaspBee II).
+- [zigpy-xbee](https://github.com/zigpy/zigpy-xbee) (radio type: xbee) Digi XBee based Zigbee radios.
+- [zigpy-zigate](https://github.com/zigpy/zigpy-zigate) (radio type: zigate) ZiGate based ZigBee radios.
+
+# Release packages available via PyPI
+
+New packages of tagged versions are also released via the "zigpy-cli" project on PyPI:
+  - https://pypi.org/project/zigpy-cli
+
+Packages of tagged versions of zigpy and its radio libraries are released via separate projects on PyPI:
+- https://pypi.org/project/zigpy
+  - https://pypi.org/project/zigpy-znp
+  - https://pypi.org/project/bellows
+  - https://pypi.org/project/zigpy-deconz
+  - https://pypi.org/project/zigpy-xbee
+  - https://pypi.org/project/zigpy-zigate
