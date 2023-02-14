@@ -10,6 +10,7 @@ import coloredlogs
 from zigpy_cli.const import LOG_LEVELS
 
 LOGGER = logging.getLogger(__name__)
+ROOT_LOGGER = logging.getLogger()
 
 
 def click_coroutine(cmd):
@@ -31,7 +32,7 @@ def cli(verbose):
     level_styles["trace"] = level_styles["spam"]
 
     LOGGER.setLevel(log_level)
-    logging.getLogger().setLevel(log_level)
+    ROOT_LOGGER.setLevel(log_level)
 
     coloredlogs.install(
         fmt=(
@@ -42,5 +43,5 @@ def cli(verbose):
         ),
         level=log_level,
         level_styles=level_styles,
-        logger=logging.getLogger(),
+        logger=ROOT_LOGGER,
     )
