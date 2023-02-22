@@ -178,33 +178,20 @@ def reconstruct_from_pcaps(ctx, network_key, fill_byte, output_root, files):
             .get("zbee_zcl_general.ota.status")
             == "0x00"
         ):
-            packet["zbee_nwk"]["zbee_nwk.dst"]
-
-            image_version = packet["zbee_zcl"]["Payload"][
-                "zbee_zcl_general.ota.file.version"
-            ]
-            image_type = packet["zbee_zcl"]["Payload"][
-                "zbee_zcl_general.ota.image.type"
-            ]
-            image_manuf_code = packet["zbee_zcl"]["Payload"][
-                "zbee_zcl_general.ota.manufacturer_code"
-            ]
+            zcl = packet["zbee_zcl"]["Payload"]
+            image_version = zcl["zbee_zcl_general.ota.file.version"]
+            image_type = zcl["zbee_zcl_general.ota.image.type"]
+            image_manuf_code = zcl["zbee_zcl_general.ota.manufacturer_code"]
 
             image_key = (image_version, image_type, image_manuf_code)
 
-            if "zbee_zcl_general.ota.image.size" in packet["zbee_zcl"]["Payload"]:
-                image_size = int(
-                    packet["zbee_zcl"]["Payload"]["zbee_zcl_general.ota.image.size"]
-                )
+            if "zbee_zcl_general.ota.image.size" in zcl:
+                image_size = int(zcl["zbee_zcl_general.ota.image.size"])
                 ota_sizes[image_key] = image_size
-            elif "zbee_zcl_general.ota.image.data" in packet["zbee_zcl"]["Payload"]:
-                offset = int(
-                    packet["zbee_zcl"]["Payload"]["zbee_zcl_general.ota.file.offset"]
-                )
+            elif "zbee_zcl_general.ota.image.data" in zcl:
+                offset = int(zcl["zbee_zcl_general.ota.file.offset"])
                 data = bytes.fromhex(
-                    packet["zbee_zcl"]["Payload"][
-                        "zbee_zcl_general.ota.image.data"
-                    ].replace(":", "")
+                    zcl["zbee_zcl_general.ota.image.data"].replace(":", "")
                 )
 
                 ota_chunks[image_key].add((offset, data))
