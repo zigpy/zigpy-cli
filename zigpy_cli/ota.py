@@ -219,6 +219,17 @@ def reconstruct_from_pcaps(ctx, network_key, fill_byte, output_root, files):
         buffer = [None] * image_size
 
         for offset, chunk in sorted(ota_chunks[image_key]):
+            current_value = buffer[offset : offset + len(chunk)]
+
+            if (
+                all(c is not None for c in buffer[offset : offset + len(chunk)])
+                and current_value != chunk
+            ):
+                LOGGER.error(
+                    f"Inconsistent {len(chunk)} bytes starting at offset"
+                    f" 0x{offset:08X}: was {current_value}, now {chunk}"
+                )
+
             buffer[offset : offset + len(chunk)] = chunk
 
         missing_indices = [o for o, v in enumerate(buffer) if v is None]
