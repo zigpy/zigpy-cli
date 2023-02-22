@@ -141,7 +141,7 @@ def generate_index(ctx, ota_url_root, output, files):
     required=True,
 )
 @click.argument("files", nargs=-1, type=pathlib.Path)
-def extract_pcap_ota(ctx, network_key, fill_byte, output_root, files):
+def reconstruct_from_pcaps(ctx, network_key, fill_byte, output_root, files):
     packets = []
 
     for f in files:
