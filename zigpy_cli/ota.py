@@ -145,6 +145,14 @@ def generate_index(ctx, ota_url_root, output, files):
 @click.argument("files", nargs=-1, type=pathlib.Path)
 def reconstruct_from_pcaps(ctx, network_keys, fill_byte, output_root, files):
     packets = []
+
+    network_keys = [
+        # ZigBeeAlliance09
+        t.KeyData.convert("5A:69:67:42:65:65:41:6C:6C:69:61:6E:63:65:30:39"),
+        # Z2M default
+        t.KeyData.convert("01:03:05:07:09:0B:0D:0F:00:02:04:06:08:0A:0C:0D"),
+    ] + list(network_keys)
+
     keys = "\n".join(
         [f'"{k}","Normal","Network Key {i + 1}"' for i, k in enumerate(network_keys)]
     )
