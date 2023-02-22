@@ -133,7 +133,9 @@ def generate_index(ctx, ota_url_root, output, files):
 
 @ota.command()
 @click.pass_context
-@click.option("--network-key", type=t.KeyData.convert, required=True)
+@click.option(
+    "--add-network-key", "network_keys", type=t.KeyData.convert, multiple=True
+)
 @click.option("--fill-byte", type=HEX_OR_DEC_INT, default=0xAB)
 @click.option(
     "--output-root",
@@ -141,15 +143,18 @@ def generate_index(ctx, ota_url_root, output, files):
     required=True,
 )
 @click.argument("files", nargs=-1, type=pathlib.Path)
-def reconstruct_from_pcaps(ctx, network_key, fill_byte, output_root, files):
+def reconstruct_from_pcaps(ctx, network_keys, fill_byte, output_root, files):
     packets = []
+    keys = "\n".join(
+        [f'"{k}","Normal","Network Key {i + 1}"' for i, k in enumerate(network_keys)]
+    )
 
     for f in files:
         proc = subprocess.run(
             [
                 "tshark",
                 "-o",
-                f'uat:zigbee_pc_keys:"{network_key}","Normal","Network Key"',
+                f"uat:zigbee_pc_keys:{keys}",
                 "-r",
                 str(f),
                 "-T",
