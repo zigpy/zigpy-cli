@@ -1,15 +1,19 @@
 from __future__ import annotations
 
+import collections
 import hashlib
 import json
 import logging
 import pathlib
+import subprocess
 
 import click
+import zigpy.types as t
 from zigpy.ota.image import ElementTagId, HueSBLOTAImage, parse_ota_image
 from zigpy.ota.validators import validate_ota_image
 
 from zigpy_cli.cli import cli
+from zigpy_cli.common import HEX_OR_DEC_INT
 
 LOGGER = logging.getLogger(__name__)
 
@@ -125,3 +129,129 @@ def generate_index(ctx, ota_url_root, output, files):
 
     json.dump(ota_metadata, output, indent=4)
     output.write("\n")
+
+
+@ota.command()
+@click.pass_context
+@click.option("--network-key", type=t.KeyData.convert, required=True)
+@click.option("--fill-byte", type=HEX_OR_DEC_INT, default=0xAB)
+@click.option(
+    "--output-root",
+    type=click.Path(file_okay=False, dir_okay=True, path_type=pathlib.Path),
+    required=True,
+)
+@click.argument("files", nargs=-1, type=pathlib.Path)
+def extract_pcap_ota(ctx, network_key, fill_byte, output_root, files):
+    packets = []
+
+    for f in files:
+        proc = subprocess.run(
+            [
+                "tshark",
+                "-o",
+                f'uat:zigbee_pc_keys:"{network_key}","Normal","Network Key"',
+                "-r",
+                str(f),
+                "-T",
+                "json",
+            ],
+            capture_output=True,
+        )
+
+        obj = json.loads(proc.stdout)
+        packets.extend(p["_source"]["layers"] for p in obj)
+
+    ota_sizes = {}
+    ota_chunks = collections.defaultdict(set)
+
+    for packet in packets:
+        if "zbee_zcl" not in packet:
+            continue
+
+        # Ignore non-OTA packets
+        if packet["zbee_aps"]["zbee_aps.cluster"] != "0x0019":
+            continue
+
+        if (
+            packet.get("zbee_zcl", {})
+            .get("Payload", {})
+            .get("zbee_zcl_general.ota.status")
+            == "0x00"
+        ):
+            packet["zbee_nwk"]["zbee_nwk.dst"]
+
+            image_version = packet["zbee_zcl"]["Payload"][
+                "zbee_zcl_general.ota.file.version"
+            ]
+            image_type = packet["zbee_zcl"]["Payload"][
+                "zbee_zcl_general.ota.image.type"
+            ]
+            image_manuf_code = packet["zbee_zcl"]["Payload"][
+                "zbee_zcl_general.ota.manufacturer_code"
+            ]
+
+            image_key = (image_version, image_type, image_manuf_code)
+
+            if "zbee_zcl_general.ota.image.size" in packet["zbee_zcl"]["Payload"]:
+                image_size = int(
+                    packet["zbee_zcl"]["Payload"]["zbee_zcl_general.ota.image.size"]
+                )
+                ota_sizes[image_key] = image_size
+            elif "zbee_zcl_general.ota.image.data" in packet["zbee_zcl"]["Payload"]:
+                offset = int(
+                    packet["zbee_zcl"]["Payload"]["zbee_zcl_general.ota.file.offset"]
+                )
+                data = bytes.fromhex(
+                    packet["zbee_zcl"]["Payload"][
+                        "zbee_zcl_general.ota.image.data"
+                    ].replace(":", "")
+                )
+
+                ota_chunks[image_key].add((offset, data))
+
+    for image_key, image_size in ota_sizes.items():
+        image_version, image_type, image_manuf_code = image_key
+        print(
+            f"Constructing image type={image_type}, version={image_version}"
+            f", manuf_code={image_manuf_code}: {image_size} bytes"
+        )
+
+        buffer = [None] * image_size
+
+        for offset, chunk in sorted(ota_chunks[image_key]):
+            buffer[offset : offset + len(chunk)] = chunk
+
+        missing_indices = [o for o, v in enumerate(buffer) if v is None]
+        missing_ranges = []
+
+        # For readability, combine the list of missing indices into a list of ranges
+        if missing_indices:
+            start = missing_indices[0]
+            count = 0
+
+            for i in missing_indices[1:]:
+                if i == start + count + 1:
+                    count += 1
+                else:
+                    missing_ranges.append((start, count + 1))
+                    start = i
+                    count = 0
+
+            if count > 0:
+                missing_ranges.append((start, count + 1))
+
+        for start, count in missing_ranges:
+            LOGGER.error(
+                f"Missing {count} bytes starting at offset 0x{start:08X}:"
+                f" filling with 0x{fill_byte:02X}"
+            )
+            buffer[start : start + count] = [fill_byte] * count
+
+        output_root.mkdir(exist_ok=True)
+        (
+            output_root
+            / (
+                f"ota_t{image_type}_m{image_manuf_code}_v{image_version}"
+                f"{'_partial' if missing_ranges else ''}.ota"
+            )
+        ).write_bytes(bytes(buffer))
