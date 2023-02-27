@@ -258,11 +258,12 @@ def reconstruct_from_pcaps(ctx, network_keys, fill_byte, output_root, files):
             )
             buffer[start : start + count] = [fill_byte] * count
 
+        filename = output_root / (
+            f"ota_t{image_type}_m{image_manuf_code}_v{image_version}"
+            f"{'_partial' if missing_ranges else ''}.ota"
+        )
+
         output_root.mkdir(exist_ok=True)
-        (
-            output_root
-            / (
-                f"ota_t{image_type}_m{image_manuf_code}_v{image_version}"
-                f"{'_partial' if missing_ranges else ''}.ota"
-            )
-        ).write_bytes(bytes(buffer))
+        filename.write_bytes(bytes(buffer))
+
+        info.callback([filename])
