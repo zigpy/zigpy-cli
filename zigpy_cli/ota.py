@@ -11,11 +11,23 @@ import click
 import zigpy.types as t
 from zigpy.ota.image import ElementTagId, HueSBLOTAImage, parse_ota_image
 from zigpy.ota.validators import validate_ota_image
+from zigpy.types.named import _hex_string_to_bytes
+from zigpy.util import convert_install_code as zigpy_convert_install_code
 
 from zigpy_cli.cli import cli
 from zigpy_cli.common import HEX_OR_DEC_INT
 
 LOGGER = logging.getLogger(__name__)
+
+
+def convert_install_code(text: str) -> t.KeyData:
+    code = _hex_string_to_bytes(text)
+    key = zigpy_convert_install_code(code)
+
+    if key is None:
+        raise ValueError(f"Invalid install code: {text!r}")
+
+    return key
 
 
 @cli.group()
@@ -136,6 +148,9 @@ def generate_index(ctx, ota_url_root, output, files):
 @click.option(
     "--add-network-key", "network_keys", type=t.KeyData.convert, multiple=True
 )
+@click.option(
+    "--add-install-code", "install_codes", type=convert_install_code, multiple=True
+)
 @click.option("--fill-byte", type=HEX_OR_DEC_INT, default=0xAB)
 @click.option(
     "--output-root",
@@ -143,19 +158,27 @@ def generate_index(ctx, ota_url_root, output, files):
     required=True,
 )
 @click.argument("files", nargs=-1, type=pathlib.Path)
-def reconstruct_from_pcaps(ctx, network_keys, fill_byte, output_root, files):
-    packets = []
+def reconstruct_from_pcaps(
+    ctx, network_keys, install_codes, fill_byte, output_root, files
+):
+    for code in install_codes:
+        print(f"Using key derived from install code: {code}")
 
-    network_keys = [
-        # ZigBeeAlliance09
-        t.KeyData.convert("5A:69:67:42:65:65:41:6C:6C:69:61:6E:63:65:30:39"),
-        # Z2M default
-        t.KeyData.convert("01:03:05:07:09:0B:0D:0F:00:02:04:06:08:0A:0C:0D"),
-    ] + list(network_keys)
+    network_keys = (
+        [
+            # ZigBeeAlliance09
+            t.KeyData.convert("5A:69:67:42:65:65:41:6C:6C:69:61:6E:63:65:30:39"),
+            # Z2M default
+            t.KeyData.convert("01:03:05:07:09:0B:0D:0F:00:02:04:06:08:0A:0C:0D"),
+        ]
+        + list(network_keys)
+        + list(install_codes)
+    )
 
     keys = "\n".join(
         [f'"{k}","Normal","Network Key {i + 1}"' for i, k in enumerate(network_keys)]
     )
+    packets = []
 
     for f in files:
         proc = subprocess.run(
