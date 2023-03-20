@@ -17,10 +17,11 @@ dependencies = [
     "click",
     "coloredlogs",
     "scapy",
-    "zigpy>=0.53.0",
-    "bellows>=0.34.3",
-    "zigpy-deconz>=0.18.0",
-    "zigpy-znp>=0.8.0",
+    "zigpy>=0.54.0",
+    "bellows>=0.35.0",
+    "zigpy-deconz>=0.19.0",
+    "zigpy-znp>=0.9.0",
+    "zigpy-xbee>=0.17.0",
 ]
 
 [tool.setuptools.packages.find]
