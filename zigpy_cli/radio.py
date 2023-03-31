@@ -56,6 +56,7 @@ async def radio(ctx, radio, port, baudrate=None, database=None):
             "backup_enabled": False,
             "startup_energy_scan": False,
             "database_path": database,
+            "use_thread": False,
         }
     )
 
