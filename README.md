@@ -175,6 +175,19 @@ $ zigpy ota generate-index --ota-url-root="https://example.org/fw" path/to/firmw
 ...
 ```
 
+## Reconstruct an OTA image from a series of packet captures
+
+Requires the `tshark` binary to be available.
+
+```console
+$ zigpy ota reconstruct-from-pcaps --add-network-key aa:bb:cc:dd:ee:ff:00:11:22:33:44:55:66:77:88:99 --output-root ./extracted/ *.pcap
+Constructing image type=0x298b, version=0x00000005, manuf_code=0x115f: 157424 bytes
+2023-02-22 03:39:51.406 ubuntu zigpy_cli.ota ERROR Missing 48 bytes starting at offset 0x0000ADA0: filling with 0xAB
+2023-02-22 03:39:51.406 ubuntu zigpy_cli.ota ERROR Missing 48 bytes starting at offset 0x000106B0: filling with 0xAB
+Constructing image type=0x298b, version=0x00000009, manuf_code=0x115f: 163136 bytes
+```
+
+
 # PCAP
 ## Re-calculate the FCS on a packet capture
 
