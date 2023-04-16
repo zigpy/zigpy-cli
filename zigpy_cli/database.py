@@ -24,9 +24,7 @@ def db():
 
 
 def sqlite3_split_statements(sql: str) -> list[str]:
-    """
-    Splits SQL into a list of statements.
-    """
+    """Splits SQL into a list of statements."""
 
     statements = []
     statement = ""
@@ -48,9 +46,7 @@ def sqlite3_split_statements(sql: str) -> list[str]:
 
 
 def sqlite3_recover(path: pathlib.Path) -> str:
-    """
-    Recovers the contents of an SQLite database as valid SQL.
-    """
+    """Recovers the contents of an SQLite database as valid SQL."""
 
     return subprocess.check_output(["sqlite3", str(path), ".recover"]).decode("utf-8")
 
@@ -70,9 +66,7 @@ def get_table_versions(cursor) -> dict[str, str]:
 
 
 async def test_database(path: pathlib.Path):
-    """
-    Opens the zigpy database with zigpy and attempts to load its contents.
-    """
+    """Opens the zigpy database with zigpy and attempts to load its contents."""
 
     with tempfile.TemporaryDirectory() as dir_name:
         dir_path = pathlib.Path(dir_name)
@@ -121,7 +115,7 @@ def recover(input_path, output_path):
             pragma_user_version,
         )
 
-    if zigpy.appdb.DB_VERSION != max_table_version:
+    if max_table_version != zigpy.appdb.DB_VERSION:
         LOGGER.warning(
             "Zigpy's current DB version is %s but the maximum table version is %s!",
             zigpy.appdb.DB_VERSION,
