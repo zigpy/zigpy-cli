@@ -232,6 +232,18 @@ def reconstruct_from_pcaps(
 
                 ota_chunks[image_key].add((offset, data))
 
+    unknown_sizes = set()
+
+    for key in ota_chunks:
+        if key in ota_sizes:
+            continue
+
+        unknown_sizes.add(key)
+        ota_sizes[key] = max(offset + len(data) for offset, data in ota_chunks[key])
+        LOGGER.error(
+            "Image size for %s not captured, assuming size %s", key, ota_sizes[key]
+        )
+
     for image_key, image_size in ota_sizes.items():
         image_version, image_type, image_manuf_code = image_key
         print(
@@ -283,6 +295,7 @@ def reconstruct_from_pcaps(
 
         filename = output_root / (
             f"ota_t{image_type}_m{image_manuf_code}_v{image_version}"
+            f"{'_unk_size' if image_key in unknown_sizes else ''}"
             f"{'_partial' if missing_ranges else ''}.ota"
         )
 
