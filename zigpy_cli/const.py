@@ -47,6 +47,16 @@ RADIO_LOGGING_CONFIGS = {
             "zigpy_xbee.api": logging.DEBUG,
         },
     ],
+    "zboss": [
+        {
+            "zigpy_zboss.zigbee.application": logging.INFO,
+            "zigpy_zboss.api": logging.INFO,
+        },
+        {
+            "zigpy_zboss.zigbee.application": logging.DEBUG,
+            "zigpy_zboss.api": logging.DEBUG,
+        },
+    ],
     "zigate": [
         {
             "zigpy_zigate": logging.INFO,
