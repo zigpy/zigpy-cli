@@ -8,9 +8,9 @@ import pathlib
 import subprocess
 
 import click
-import zigpy.types as t
 from zigpy.ota.image import ElementTagId, HueSBLOTAImage, parse_ota_image
 from zigpy.ota.validators import validate_ota_image
+import zigpy.types as t
 from zigpy.types.named import _hex_string_to_bytes
 from zigpy.util import convert_install_code as zigpy_convert_install_code
 
