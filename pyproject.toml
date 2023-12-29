@@ -23,7 +23,8 @@ dependencies = [
     "zigpy-xbee>=0.18.0",
     "zigpy-zboss>=1.1.0",
     "zigpy-zigate>=0.11.0",
-    "zigpy-znp>=0.11.1"
+    "zigpy-znp>=0.11.1",
+    "zigpy-espzb>=0.0.1"
 ]
 
 [tool.setuptools.packages.find]
