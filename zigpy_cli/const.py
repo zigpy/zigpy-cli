@@ -13,6 +13,7 @@ RADIO_TO_PACKAGE = {
     "xbee": "zigpy_xbee",
     "zigate": "zigpy_zigate",
     "znp": "zigpy_znp",
+    "eznp": "zigpy_eznp",
 }
 
 
@@ -55,6 +56,16 @@ RADIO_LOGGING_CONFIGS = {
         {
             "zigpy_zboss.zigbee.application": logging.DEBUG,
             "zigpy_zboss.api": logging.DEBUG,
+        },
+    ],
+    "eznp": [
+        {
+            "zigpy_eznp.zigbee.application": logging.INFO,
+            "zigpy_eznp.api": logging.INFO,
+        },
+        {
+            "zigpy_eznp.zigbee.application": logging.DEBUG,
+            "zigpy_eznp.api": logging.DEBUG,
         },
     ],
     "zigate": [
