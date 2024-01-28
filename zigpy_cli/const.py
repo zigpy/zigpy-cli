@@ -11,7 +11,7 @@ RADIO_TO_PACKAGE = {
     "ezsp": "bellows",
     "deconz": "zigpy_deconz",
     "xbee": "zigpy_xbee",
-    "zboss" : "zigpy_zboss",
+    "zboss": "zigpy_zboss",
     "zigate": "zigpy_zigate",
     "znp": "zigpy_znp",
 }
