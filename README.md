@@ -137,6 +137,42 @@ Some devices (like older Aqara sensors) may not migrate.
 $ zigpy radio znp /dev/ttyUSB0 change-channel --channel 25
 ```
 
+## Network scan
+
+On supported radios, you can perform an active beacon scan for nearby 802.15.4 networks:
+
+```console
+$ zigpy radio ezsp /dev/ttyUSB0 network-scan --channels 11,15,20,25 --duration-exponent 3
+channel: 11, network: 0x1D13 (00:07:81:00:0e:e9:d8:9f), permitting joins: 1, nwk update id: 0, lqi:  180, rssi: -66
+channel: 11, network: 0x2857 (00:07:81:00:fc:9e:ef:95), permitting joins: 0, nwk update id: 0, lqi:  224, rssi: -55
+channel: 11, network: 0x08C7 (00:07:81:00:50:d2:be:2e), permitting joins: 0, nwk update id: 0, lqi:  216, rssi: -57
+channel: 15, network: 0x2ABB (00:07:81:00:c5:10:10:4b), permitting joins: 0, nwk update id: 0, lqi:  212, rssi: -58
+Scanning channel 15
+```
+
+## Packet capture
+
+On supported radios, you can capture packets and pipe the PCAP output to Wireshark:
+
+```console
+$ zigpy radio ezsp /dev/cu.SLAB_USBtoUART14 packet-capture -c 12,13,14,26 --interleave --channel-hop-period 1 -o - | wireshark -k -S -i -
+```
+
+If you have multiple adapters, you can capture with multiple interfaces concurrently:
+
+```console
+(
+    zigpy radio ezsp /dev/cu.SLAB_USBtoUART   packet-capture -c 11 --interleave -o -  &
+    zigpy radio ezsp /dev/cu.SLAB_USBtoUART8  packet-capture -c 15 --interleave -o -  &
+    zigpy radio ezsp /dev/cu.SLAB_USBtoUART10 packet-capture -c 20 --interleave -o -  &
+    zigpy radio ezsp /dev/cu.SLAB_USBtoUART13 packet-capture -c 25 --interleave -o -  &
+    zigpy radio ezsp /dev/cu.SLAB_USBtoUART14 packet-capture -c 12,13,14,26 --interleave --channel-hop-period 1 -o -  &
+    zigpy radio ezsp /dev/cu.SLAB_USBtoUART17 packet-capture -c 16,17,18,19 --interleave --channel-hop-period 1 -o -  &
+    zigpy radio ezsp /dev/cu.SLAB_USBtoUART18 packet-capture -c 21,22,23,24 --interleave --channel-hop-period 1 -o -  &
+    wait
+) | zigpy pcap interleave-combine -o - | wireshark -k -S -i -
+```
+
 # OTA
 ## Display basic information about OTA files
 ```console
