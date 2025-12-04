@@ -126,6 +126,7 @@ def generate_index(ctx, ota_url_root, output, files):
         metadata = {
             "binary_url": url,
             "file_version": image.header.file_version,
+            "file_size": len(contents),
             "image_type": image.header.image_type,
             "manufacturer_id": image.header.manufacturer_id,
             "changelog": "",
