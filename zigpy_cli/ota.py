@@ -140,7 +140,7 @@ def generate_index(ctx, ota_url_root, output, files):
         LOGGER.info("Writing %s", f)
         ota_metadata.append(metadata)
 
-    json.dump(ota_metadata, output, indent=4)
+    json.dump({"firmwares": ota_metadata}, output, indent=4)
     output.write("\n")
 
 
