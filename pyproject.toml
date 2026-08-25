@@ -12,18 +12,18 @@ authors = [
 ]
 readme = "README.md"
 license = {text = "GPL-3.0"}
-requires-python = ">=3.8"
+requires-python = ">=3.11"
 dependencies = [
-    "click",
-    "coloredlogs",
-    "scapy",
-    "zigpy>=0.75.0",
-    "bellows>=0.43.0",
-    "zigpy-deconz>=0.21.0",
-    "zigpy-xbee>=0.18.0",
-    "zigpy-zboss>=1.1.0",
-    "zigpy-zigate>=0.11.0",
-    "zigpy-znp>=0.11.1"
+    "click>=8.1",
+    "coloredlogs>=15.0",
+    "scapy>=2.5.0",
+    "zigpy>=0.85.0",
+    "bellows>=0.47.0",
+    "zigpy-deconz>=0.25.0",
+    "zigpy-xbee>=0.21.0",
+    "zigpy-zboss>=1.2.0",
+    "zigpy-zigate>=0.14.0",
+    "zigpy-znp>=1.0.0"
 ]
 
 [tool.setuptools.packages.find]
