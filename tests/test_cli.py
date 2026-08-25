@@ -60,3 +60,16 @@ def test_get_or_create_event_loop_replaces_closed_loop():
 
     assert new_loop is not loop
     assert not new_loop.is_closed()
+
+
+def test_get_or_create_event_loop_reregisters_cleared_loop():
+    """The loop stays registered as current even if something else clears it.
+
+    Radio libraries call `asyncio.get_event_loop()` at runtime, which fails on
+    Python 3.14 when no loop is set.
+    """
+    loop = get_or_create_event_loop()
+    asyncio.set_event_loop(None)
+
+    assert get_or_create_event_loop() is loop
+    assert asyncio.get_event_loop() is loop

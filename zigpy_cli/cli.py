@@ -27,7 +27,11 @@ def get_or_create_event_loop() -> asyncio.AbstractEventLoop:
 
     if _LOOP is None or _LOOP.is_closed():
         _LOOP = asyncio.new_event_loop()
-        asyncio.set_event_loop(_LOOP)
+
+    # Re-register every time: radio libraries call `asyncio.get_event_loop()` at
+    # runtime, so the loop has to stay the thread's current one even if something
+    # else cleared it in the meantime.
+    asyncio.set_event_loop(_LOOP)
 
     return _LOOP
 
