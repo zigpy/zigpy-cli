@@ -11,7 +11,6 @@ RADIO_TO_PACKAGE = {
     "ezsp": "bellows",
     "deconz": "zigpy_deconz",
     "xbee": "zigpy_xbee",
-    "zboss": "zigpy_zboss",
     "zigate": "zigpy_zigate",
     "znp": "zigpy_znp",
 }
@@ -46,16 +45,6 @@ RADIO_LOGGING_CONFIGS = {
         {
             "zigpy_xbee.zigbee.application": logging.DEBUG,
             "zigpy_xbee.api": logging.DEBUG,
-        },
-    ],
-    "zboss": [
-        {
-            "zigpy_zboss.zigbee.application": logging.INFO,
-            "zigpy_zboss.api": logging.INFO,
-        },
-        {
-            "zigpy_zboss.zigbee.application": logging.DEBUG,
-            "zigpy_zboss.api": logging.DEBUG,
         },
     ],
     "zigate": [

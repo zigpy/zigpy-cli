@@ -12,31 +12,41 @@ authors = [
 ]
 readme = "README.md"
 license = {text = "GPL-3.0"}
-requires-python = ">=3.8"
+requires-python = ">=3.11"
 dependencies = [
-    "click",
-    "coloredlogs",
-    "scapy",
-    "zigpy>=0.75.0",
-    "bellows>=0.43.0",
-    "zigpy-deconz>=0.21.0",
-    "zigpy-xbee>=0.18.0",
-    "zigpy-zboss>=1.1.0",
-    "zigpy-zigate>=0.11.0",
-    "zigpy-znp>=0.11.1"
+    "click>=8.1",
+    "coloredlogs>=15.0",
+    "scapy>=2.5.0",
+    "zigpy>=2.0.0",
+    "bellows>=0.47.0",
+    "zigpy-deconz>=0.25.0",
+    "zigpy-xbee>=0.22.0",
+    "zigpy-zigate>=0.14.0",
+    "zigpy-znp>=1.0.0"
 ]
 
 [tool.setuptools.packages.find]
 exclude = ["tests", "tests.*"]
 
-[project.optional-dependencies]
+[dependency-groups]
 testing = [
-    "pytest>=7.1.2",
-    "pytest-asyncio>=0.19.0",
-    "pytest-timeout>=2.1.0",
-    "pytest-mock>=3.8.2",
-    "pytest-cov>=3.0.0",
+    "coverage[toml]>=7.0",
+    "pre-commit>=3.5",
+    "pytest>=8.4",
+    "pytest-asyncio>=1.0",
+    "pytest-cov>=5.0",
+    "pytest-mock>=3.14",
+    "pytest-timeout>=2.3",
 ]
+ci = [
+    {include-group = "testing"},
+    "pytest-github-actions-annotate-failures>=0.2",
+    "pytest-xdist>=3.5",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 
 [tool.setuptools-git-versioning]
 enabled = true

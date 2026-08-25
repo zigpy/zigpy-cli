@@ -11,10 +11,8 @@ import random
 import sys
 
 import click
-import zigpy.state
+import zigpy.backups
 import zigpy.types
-import zigpy.zdo
-import zigpy.zdo.types
 from zigpy.application import ControllerApplication
 
 from zigpy_cli.cli import cli, click_coroutine
