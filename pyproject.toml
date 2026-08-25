@@ -17,10 +17,10 @@ dependencies = [
     "click>=8.1",
     "coloredlogs>=15.0",
     "scapy>=2.5.0",
-    "zigpy>=0.85.0",
+    "zigpy>=2.0.0",
     "bellows>=0.47.0",
     "zigpy-deconz>=0.25.0",
-    "zigpy-xbee>=0.21.0",
+    "zigpy-xbee>=0.22.0",
     "zigpy-zigate>=0.14.0",
     "zigpy-znp>=1.0.0"
 ]
