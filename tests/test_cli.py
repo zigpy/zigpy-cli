@@ -9,15 +9,15 @@ from zigpy_cli.cli import click_coroutine, get_or_create_event_loop
 @pytest.fixture(autouse=True)
 def reset_loop():
     """Keep the module-level loop from leaking between tests."""
-    old_loop = cli_module._LOOP
     cli_module._LOOP = None
+    asyncio.set_event_loop(None)
 
     yield
 
     if cli_module._LOOP is not None and not cli_module._LOOP.is_closed():
         cli_module._LOOP.close()
 
-    cli_module._LOOP = old_loop
+    cli_module._LOOP = None
     asyncio.set_event_loop(None)
 
 
