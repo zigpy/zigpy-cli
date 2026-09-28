@@ -121,7 +121,7 @@ def recover(input_path, output_path):
             pragma_user_version,
         )
 
-    if zigpy.appdb.DB_VERSION != max_table_version:
+    if max_table_version != zigpy.appdb.DB_VERSION:
         LOGGER.warning(
             "Zigpy's current DB version is %s but the maximum table version is %s!",
             zigpy.appdb.DB_VERSION,
