@@ -33,6 +33,8 @@ radio requires exclusive access to the hardware: if both are running at once, ne
 Network commands require the radio type to be specified. See `zigpy radio --help` for the list of supported types.
 If your radio requires a different baudrate than the radio library default (mainly EZSP), you must specify it as a command line option. For example, `zigpy radio --baudrate 115200 ezsp backup -`.
 
+Similarly if a different flow control is required ("hardware" or "software"), this also must be specified, otherwise the driver default will be used (usually software flow control). For example, `zigpy radio --flow-control hardware znp backup -`.
+
 ## Network backup
 
 ```console

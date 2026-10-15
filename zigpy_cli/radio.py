@@ -28,9 +28,10 @@ LOGGER = logging.getLogger(__name__)
 @click.argument("radio", type=click.Choice(list(RADIO_TO_PACKAGE.keys())))
 @click.argument("port", type=str)
 @click.option("--baudrate", type=int, default=None)
+@click.option("--flow-control", type=click.Choice(["software", "hardware", "none"]), default=None)
 @click.option("--database", type=str, default=None)
 @click_coroutine
-async def radio(ctx, radio, port, baudrate=None, database=None):
+async def radio(ctx, radio, port, baudrate=None, flow_control=None, database=None):
     # Setup logging for the radio
     verbose = ctx.parent.params["verbose"]
     logging_configs = RADIO_LOGGING_CONFIGS[radio]
@@ -62,6 +63,9 @@ async def radio(ctx, radio, port, baudrate=None, database=None):
 
     if baudrate is not None:
         config["device"]["baudrate"] = baudrate
+
+    if flow_control == "hardware" or flow_control == "software":
+        config["device"]["flow_control"] = flow_control
 
     app = radio_module.ControllerApplication(config)
 
