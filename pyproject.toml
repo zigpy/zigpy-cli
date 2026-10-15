@@ -54,18 +54,27 @@ enabled = true
 [project.scripts]
 zigpy = "zigpy_cli.__main__:cli"
 
-
 [tool.ruff]
-select = [
-    # Pyflakes
-    "F",
-    # Pycodestyle
-    "E",
-    "W",
-    # isort
-    "I001"
-]
+target-version = "py311"
+line-length = 88
 src = ["zigpy_cli", "tests"]
 
-[tool.ruff.isort]
+[tool.ruff.lint]
+select = [
+    "B", # flake8-bugbear
+    "C", # complexity
+    "E", # pycodestyle
+    "F", # pyflakes/autoflake
+    "I", # isort
+    "SIM", # flake8-simplify
+    "UP", # pyupgrade
+    "W", # pycodestyle
+]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 25
+
+[tool.ruff.lint.isort]
+force-sort-within-sections = true
 known-first-party = ["zigpy_cli", "tests"]
+combine-as-imports = true

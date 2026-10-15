@@ -6,10 +6,10 @@ import logging
 import sys
 
 import click
-import zigpy.types as t
 from scapy.config import conf as scapy_conf
 from scapy.layers.dot15d4 import Dot15d4  # NOQA: F401
 from scapy.utils import PcapReader, PcapWriter
+import zigpy.types as t
 
 from zigpy_cli.cli import cli
 

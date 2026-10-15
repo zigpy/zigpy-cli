@@ -11,9 +11,9 @@ import random
 import sys
 
 import click
+from zigpy.application import ControllerApplication
 import zigpy.backups
 import zigpy.types
-from zigpy.application import ControllerApplication
 
 from zigpy_cli.cli import cli, click_coroutine
 from zigpy_cli.common import CHANNELS_LIST
@@ -127,10 +127,7 @@ async def backup(
             "i_understand_i_can_update_eui64_only_once_and_i_still_want_to_do_it"
         ] = True
 
-    if zigpy_format:
-        obj = backup.as_dict()
-    else:
-        obj = backup.as_open_coordinator_json()
+    obj = backup.as_dict() if zigpy_format else backup.as_open_coordinator_json()
 
     output.write(json.dumps(obj, indent=4) + "\n")
 
