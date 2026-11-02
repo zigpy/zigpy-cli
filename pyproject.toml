@@ -22,7 +22,8 @@ dependencies = [
     "zigpy-deconz>=0.25.0",
     "zigpy-xbee>=0.22.0",
     "zigpy-zigate>=0.14.0",
-    "zigpy-znp>=1.0.0"
+    "zigpy-znp>=1.0.0",
+    "zigpy-ziggurat>=1.1.1",
 ]
 
 [tool.setuptools.packages.find]
