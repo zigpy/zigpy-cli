@@ -74,7 +74,7 @@ RADIO_LOGGING_CONFIGS = {
         {
             "zigpy_ziggurat": logging.DEBUG,
         },
-    ]
+    ],
 }
 
 RADIO_TO_PYPI = {name: mod.replace("_", "-") for name, mod in RADIO_TO_PACKAGE.items()}
