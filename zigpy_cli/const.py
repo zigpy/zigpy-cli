@@ -13,6 +13,7 @@ RADIO_TO_PACKAGE = {
     "xbee": "zigpy_xbee",
     "zigate": "zigpy_zigate",
     "znp": "zigpy_znp",
+    "ziggurat": "zigpy_ziggurat",
 }
 
 
@@ -64,6 +65,14 @@ RADIO_LOGGING_CONFIGS = {
         },
         {
             "zigpy_znp": TRACE,
+        },
+    ],
+    "ziggurat": [
+        {
+            "zigpy_ziggurat": logging.INFO,
+        },
+        {
+            "zigpy_ziggurat": logging.DEBUG,
         },
     ],
 }
